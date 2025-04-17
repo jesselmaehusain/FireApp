@@ -8,4 +8,5 @@ urlpatterns = [
     path('', HomePageView.as_view(), name='home'),
     path('stations', views.map_station, name='map_station'),
     path('maps/jqvmap.html', views.map_station, name='jqvmap'),
+    path('incidents/', views.map_incidents, name='map_incidents'),
 ]
