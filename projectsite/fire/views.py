@@ -1,11 +1,22 @@
-from django.shortcuts import render
+from django.contrib import messages
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic.list import ListView
+from .models import Locations, Incident, FireStation, FireTruck, Firefighters, WeatherConditions
 from django.db import connection
+from collections import defaultdict
 from django.http import JsonResponse
 from django.db.models.functions import ExtractMonth
+from django.db.models import Q
 from django.db.models import Count
+import calendar
 from datetime import datetime
-from django.views.generic.list import ListView
-from fire.models import Locations, Incident, FireStation
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from .models import FireStation
+from .forms import FireStationForm
+
+
 
 class HomePageView(ListView):
     model = Locations
@@ -39,6 +50,31 @@ class ChartView(ListView):
         else:
             data = {}
         return JsonResponse(data)
+
+def LineCountbyMonth(request):
+    current_year = datetime.now().year
+
+    result = {month: 0 for month in range(1, 13)}
+
+    incidents_per_month = Incident.objects.filter(date_time__year=current_year) \
+        .values_list('date_time', flat=True)
+
+    # Counting the number of incidents per month
+    for date_time in incidents_per_month:
+        month = date_time.month
+        result[month] += 1
+
+    # If you want to convert month numbers to month names, you can use a dictionary mapping
+    month_names = {
+        1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
+        7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'
+    }
+
+    result_with_month_names = {
+        month_names[int(month)]: count for month, count in result.items()
+    }
+
+    return JsonResponse(result_with_month_names)
 
 
 def map_station(request):
@@ -89,3 +125,64 @@ def map_incidents(request):
     }
 
     return render(request, 'map_incidents.html', context)
+
+
+
+class FireStationListView(ListView):
+    model = FireStation
+    context_object_name = 'stations'
+    template_name = 'stations_list.html'
+    paginate_by = 5
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        if self.request.GET.get("q") is not None:
+            query = self.request.GET.get('q')
+            qs = qs.filter(
+                Q(name__icontains=query) |
+                Q(address__icontains=query) |
+                Q(city__icontains=query) |
+                Q(country__icontains=query)
+            )
+        return qs.order_by('id') 
+    
+
+class FireStationCreateView(CreateView):
+    form_class = FireStationForm
+    template_name = 'stations_add.html'
+    success_url = reverse_lazy('stations_list')
+
+    def form_valid(self, form):
+        station_name = form.instance.name
+        messages.success(self.request, f'Fire Station "{station_name}" created successfully!')
+        return super().form_valid(form)
+    
+class FireStationUpdateView(UpdateView):
+    form_class = FireStationForm
+    template_name = 'stations_edit.html'
+    success_url = reverse_lazy('stations_list')
+
+    def get_queryset(self):
+        # Custom queryset to fetch the specific FireStation instance
+        return FireStation.objects.filter(id=self.kwargs['pk'])
+
+    def form_valid(self, form):
+        # Perform default behavior for valid form submission
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        # Custom behavior for invalid form submission (optional)
+        return super().form_invalid(form)
+
+    def get_success_url(self):
+        # Optionally, you can add dynamic success URL logic here
+        return super().get_success_url()
+    
+class FireStationDeleteView(DeleteView):
+    model = FireStationForm
+    template_name= 'stations_del.html'
+    success_url = reverse_lazy('stations_list')
+
+    
+    def get_queryset(self):
+        return FireStation.objects.filter(id=self.kwargs['pk'])
