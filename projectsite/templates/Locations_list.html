@@ -53,9 +53,8 @@
                       <td>{{ object.city }}</td>
                       <td>{{ object.country }}</td>
                       <td>
-                          <a href="{% url 'location_update' object.id %}">Edit</a>
-                          <span>&nbsp;</span>
-                          <a href="{% url 'location_delete' object.id %}" class="text-danger">Delete</a>
+                        <a href="{% url 'location_update' object.pk %}" class="btn btn-sm btn-primary" style="max-width: 80px;">Edit</a>
+                        <a href="{% url 'location_delete' object.pk %}" class="btn btn-sm btn-danger" style="max-width: 80px;">Delete</a>
                       </td>
                     </tr>
               {% empty %}

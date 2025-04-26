@@ -14,7 +14,7 @@ from datetime import datetime
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import FireStation
-from .forms import FireStationForm, Incident_Form, LocationForm
+from .forms import FireStationForm, Incident_Form, LocationForm, FireTruckForm
 from datetime import datetime
 
 
@@ -278,4 +278,32 @@ class LocationDeleteView(DeleteView):
     template_name = 'Locations_del.html'
     success_url = reverse_lazy('location_list')
     
+class FireTruckListView(ListView):
+    model = FireTruck
+    template_name = 'FireTrucks_list.html'
+    context_object_name = 'firetrucks'
+    paginate_by = 10
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        query = self.request.GET.get('q')
+        if query:
+            queryset = queryset.filter(Q(truck_number__icontains=query) | Q(model__icontains=query))
+        return queryset.order_by('id')  
+
+class FireTruckCreateView(CreateView):
+    model = FireTruck
+    form_class = FireTruckForm
+    template_name = 'FireTrucks_add.html'
+    success_url = reverse_lazy('firetruck_list')
+
+class FireTruckUpdateView(UpdateView):
+    model = FireTruck
+    form_class = FireTruckForm
+    template_name = 'FireTrucks_edit.html'
+    success_url = reverse_lazy('firetruck_list')
+
+class FireTruckDeleteView(DeleteView):
+    model = FireTruck
+    template_name = 'FireTrucks_del.html'
+    success_url = reverse_lazy('firetruck_list')
