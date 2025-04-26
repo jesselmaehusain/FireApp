@@ -26,8 +26,12 @@
         <div class="col-md-2">
          </div>
             <div class="col-md-6">
-              <div class="pull-right"> <a href="{% url 'stations_add' %}" class="btn btn-warning btn-rounded">Add new Firestations</a>
-        </div>
+              <div class="pull-right">
+                <a href="{% url 'stations_add' %}" class="btn btn-rounded custom-add-btn" 
+                   style="background: linear-gradient(90deg, #ADD8E6, #87CEEB);">
+                   Add new Firestations
+                </a>
+            </div>  
         </div>
         <div class="card-body">
         <table class="table table-striped mt-3">
@@ -49,6 +53,7 @@
                 <td>{{ object.country }}</td>
                 <td>
                     <a href="{% url 'stations_update' object.id %}">Edit</a>
+                    <span>&nbsp;</span>
                     <a href="{% url 'stations_delete' object.id %}" class="text-danger">Delete</a>
                 </td>
               </tr>

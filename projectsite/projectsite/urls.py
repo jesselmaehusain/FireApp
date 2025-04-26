@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path
-from fire.views import HomePageView, ChartView, LineCountbyMonth, FireStationListView, FireStationCreateView, FireStationUpdateView, FireStationDeleteView
+from fire.views import HomePageView, ChartView, LineCountbyMonth, FireStationListView, FireStationCreateView, FireStationUpdateView, FireStationDeleteView, IncidentListView, IncidentCreateView, IncidentUpdateView, IncidentDeleteView
+
 #from fire.views import PieCountBySeverity
 from fire import views
 
@@ -10,13 +11,21 @@ urlpatterns = [
     path('dashboard_chart', ChartView.as_view(), name='dashboard_chart'),
     #path('chart/', PieCountbySeverity, name='chart'),
 
-    #Fire Station 
+   # Fire Station
     path('stations', views.map_station, name='map_station'),
     path('maps/jqvmap.html', views.map_station, name='jqvmap'),
-    path('incidents/', views.map_incidents, name='map_incidents'),
+    path('incidents/map/', views.map_incidents, name='map_incidents'),
+
+    # Fire Station CRUD
     path('fire-stations/', FireStationListView.as_view(), name='stations_list'),
     path('fire-stations/new/', FireStationCreateView.as_view(), name='stations_add'),
     path('station/<int:pk>/update/', FireStationUpdateView.as_view(), name='stations_update'),
     path('station/<int:pk>/delete/', views.FireStationDeleteView.as_view(), name='stations_delete'),
+
+    # Incidents
+    path('incidents/', IncidentListView.as_view(), name='incident_list'),
+    path('incidents/new/', views.IncidentCreateView.as_view(), name='incident_add'),
+    path('incident/<int:pk>/update/', views.IncidentUpdateView.as_view(), name='incident_update'),
+    path('incident/<int:pk>/delete/', views.IncidentDeleteView.as_view(), name='incident_delete'),
 
 ]

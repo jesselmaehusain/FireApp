@@ -14,7 +14,8 @@ from datetime import datetime
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import FireStation
-from .forms import FireStationForm
+from .forms import FireStationForm, Incident_Form
+from datetime import datetime
 
 
 
@@ -146,7 +147,7 @@ class FireStationListView(ListView):
             )
         return qs.order_by('id') 
     
-
+#Fire Stations classView
 class FireStationCreateView(CreateView):
     form_class = FireStationForm
     template_name = 'stations_add.html'
@@ -186,3 +187,52 @@ class FireStationDeleteView(DeleteView):
     
     def get_queryset(self):
         return FireStation.objects.filter(id=self.kwargs['pk'])
+    
+#Incident classView
+class IncidentListView(ListView):
+    orm_class = Incident_Form
+    model = Incident
+    template_name = 'incident_list.html'
+    context_object_name = 'object_list'
+    paginate_by = 10
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        query = self.request.GET.get("q")
+        if query:
+            qs = qs.filter(
+                Q(description__icontains=query) |
+                Q(severity_level__icontains=query) |
+                Q(location__name__icontains=query) |
+                Q(date_time__icontains=query)
+            )
+        return qs
+    
+class IncidentCreateView(CreateView):
+    
+    model = Incident
+    template_name = 'incident_add.html'
+    fields = ['description', 'severity_level', 'location', 'date_time']
+    success_url = reverse_lazy('incident_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Incident created successfully!')
+        return super().form_valid(form)
+    
+class IncidentUpdateView(UpdateView):
+    model = Incident
+    template_name = 'incident_edit.html'
+    fields = ['description', 'severity_level', 'location', 'date_time']
+    success_url = reverse_lazy('incident_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Incident updated successfully!')
+        return super().form_valid(form)
+    
+class IncidentDeleteView(DeleteView):
+    model = Incident
+    template_name = 'incident_del.html'
+    success_url = reverse_lazy('incident_list')
+
+    def get_queryset(self):
+        return Incident.objects.filter(id=self.kwargs['pk'])
