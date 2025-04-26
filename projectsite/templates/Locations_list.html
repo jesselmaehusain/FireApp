@@ -27,9 +27,9 @@
           </div>
           <div class="col-md-6">
             <div class="pull-right">
-                <a href="{% url 'incident_add' %}" class="btn btn-rounded custom-add-btn" 
+                <a href="{% url 'location_add' %}" class="btn btn-rounded custom-add-btn" 
                 style="background: linear-gradient(90deg, #ADD8E6, #87CEEB);">
-                    Add new Incidents
+                    Add new Locations
                 </a>
             </div>
           </div>
@@ -37,27 +37,27 @@
         <div class="card-body">
           <table class="table table-striped mt-3">
             <thead>
-              <tr>
-                <th scope="col">Date</th>
-                <th scope="col">Time</th>
-                <th scope="col">Severity Level</th>
-                <th scope="col">Description</th>
-                <th scope="col">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for object in object_list %}
-              <tr>
-                <td>{{ object.date_time|date:"F d, Y" }}</td>
-                <td>{{ object.date_time|time:"H:i A" }}</td>
-                <td>{{ object.severity_level }}</td>
-                <td>{{ object.description }}</td>
-                <td>
-                  <a href="{% url 'incident_update' object.id %}">Edit</a>
-                    <span>&nbsp;</span>
-                  <a href="{% url 'incident_delete' object.id %}" class="text-danger">Delete</a>
-                </td>
-              </tr>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Address</th>
+                    <th scope="col">City</th>
+                    <th scope="col">Country</th>
+                    <th scope="col">Action</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                    {% for object in object_list %}
+                    <tr>
+                      <td>{{ object.name }}</td>
+                      <td>{{ object.address }}</td>
+                      <td>{{ object.city }}</td>
+                      <td>{{ object.country }}</td>
+                      <td>
+                          <a href="{% url 'location_update' object.id %}">Edit</a>
+                          <span>&nbsp;</span>
+                          <a href="{% url 'location_delete' object.id %}" class="text-danger">Delete</a>
+                      </td>
+                    </tr>
               {% empty %}
               <tr>
                 <td colspan="5" style="text-align: center">

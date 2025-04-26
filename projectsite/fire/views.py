@@ -14,7 +14,7 @@ from datetime import datetime
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import FireStation
-from .forms import FireStationForm, Incident_Form
+from .forms import FireStationForm, Incident_Form, LocationForm
 from datetime import datetime
 
 
@@ -209,15 +209,19 @@ class IncidentListView(ListView):
         return qs
     
 class IncidentCreateView(CreateView):
-    
     model = Incident
+    form_class = Incident_Form
     template_name = 'incident_add.html'
-    fields = ['description', 'severity_level', 'location', 'date_time']
     success_url = reverse_lazy('incident_list')
 
     def form_valid(self, form):
-        messages.success(self.request, 'Incident created successfully!')
         return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['incident_list'] = self.success_url
+        return context
+
     
 class IncidentUpdateView(UpdateView):
     model = Incident
@@ -226,8 +230,8 @@ class IncidentUpdateView(UpdateView):
     success_url = reverse_lazy('incident_list')
 
     def form_valid(self, form):
-        messages.success(self.request, 'Incident updated successfully!')
         return super().form_valid(form)
+
     
 class IncidentDeleteView(DeleteView):
     model = Incident
@@ -236,3 +240,42 @@ class IncidentDeleteView(DeleteView):
 
     def get_queryset(self):
         return Incident.objects.filter(id=self.kwargs['pk'])
+    
+
+class LocationsListView(ListView):
+    model = Locations
+    form_class = LocationForm
+    template_name = 'Locations_list.html'
+    context_object_name = 'locations'
+    paginate_by = 10
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        if self.request.GET.get("q") is not None:
+            query = self.request.GET.get('q')
+            qs = qs.filter(
+                Q(name__icontains=query) |
+                Q(address__icontains=query) |
+                Q(city__icontains=query) |
+                Q(country__icontains=query)
+            )
+        return qs.order_by('id')
+
+class LocationCreateView(CreateView):
+    model = Locations
+    form_class = LocationForm
+    template_name = 'Locations_add.html'
+    success_url = reverse_lazy('location_list')
+
+class LocationUpdateView(UpdateView):
+    model = Locations
+    form_class = LocationForm
+    template_name = 'Locations_edit.html'
+    success_url = reverse_lazy('location_list')
+
+class LocationDeleteView(DeleteView):
+    model = Locations
+    template_name = 'Locations_del.html'
+    success_url = reverse_lazy('location_list')
+    
+
