@@ -14,7 +14,7 @@ from datetime import datetime
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import FireStation
-from .forms import FireStationForm, Incident_Form, LocationForm, FireTruckForm
+from .forms import FireStationForm, Incident_Form, LocationForm, FireTruckForm, FirefightersForm
 from datetime import datetime
 
 
@@ -193,7 +193,7 @@ class IncidentListView(ListView):
     orm_class = Incident_Form
     model = Incident
     template_name = 'incident_list.html'
-    context_object_name = 'object_list'
+    context_object_name = 'incident_list'
     paginate_by = 10
 
     def get_queryset(self, *args, **kwargs):
@@ -246,7 +246,7 @@ class LocationsListView(ListView):
     model = Locations
     form_class = LocationForm
     template_name = 'Locations_list.html'
-    context_object_name = 'locations'
+    context_object_name = 'location_list'
     paginate_by = 10
 
     def get_queryset(self, *args, **kwargs):
@@ -281,7 +281,7 @@ class LocationDeleteView(DeleteView):
 class FireTruckListView(ListView):
     model = FireTruck
     template_name = 'FireTrucks_list.html'
-    context_object_name = 'firetrucks'
+    context_object_name = 'firetruck'
     paginate_by = 10
 
     def get_queryset(self):
@@ -307,3 +307,38 @@ class FireTruckDeleteView(DeleteView):
     model = FireTruck
     template_name = 'FireTrucks_del.html'
     success_url = reverse_lazy('firetruck_list')
+
+class FirefightersListView(ListView):
+    model = Firefighters
+    form_class = FirefightersForm
+    template_name = 'FireFighters_list.html'
+    context_object_name = 'firefighter_list'
+    paginate_by = 10
+
+    def get_queryset(self):
+        query = self.request.GET.get('q')  
+        if query:
+            return Firefighters.objects.filter(
+                Q(name__icontains=query) |
+                Q(rank__icontains=query) |
+                Q(experience_level__icontains=query) |
+                Q(station__name__icontains=query)
+            )
+        return Firefighters.objects.all().order_by('id')
+
+class FirefightersCreateView(CreateView):
+    model = Firefighters
+    form_class = FirefightersForm
+    template_name = 'FireFighters_add.html'
+    success_url = reverse_lazy('firefighter_list')
+
+class FirefightersUpdateView(UpdateView):
+    model = Firefighters
+    form_class = FirefightersForm
+    template_name = 'FireFighters_edit.html'
+    success_url = reverse_lazy('firefighter_list')
+
+class FirefightersDeleteView(DeleteView):
+    model = Firefighters
+    template_name = 'FireFighters_del.html'
+    success_url = reverse_lazy('firefighter_list')

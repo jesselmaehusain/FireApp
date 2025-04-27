@@ -2,38 +2,38 @@
 
 {% block content %}
 <div class="container">
-    <h2>List of Fire Trucks</h2>
+    <h2>List of Fire Fighters</h2>
     
     <form method="get" class="form-inline mb-3">
         <input type="text" name="q" class="form-control mr-2" placeholder="Search" value="{{ request.GET.q }}">
         <button class="btn btn-sm btn-primary" type="submit">Search</button>
       </form>
       <div class="pull-right">
-                <a href="{% url 'firetruck_add' %}" class="btn btn-rounded custom-add-btn" 
+                <a href="{% url 'firefighter_add' %}" class="btn btn-rounded custom-add-btn" 
                 style="background: linear-gradient(90deg, #ADD8E6, #87CEEB);">
-                    Add new Fire Trucks
+                    Add new Fire Fighters
                 </a>
             </div>
     <table class="table">
         <thead>
             <tr>
-                <th>Truck Number</th>
-                <th>Model</th>
-                <th>Capacity</th>
-                <th style="width: 300px;">Station</th> 
+                <th>Name</th>
+                <th>Rank</th>
+                <th>Experience Level</th>
+                <th>Station</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for object in object_list %}
             <tr>
-                <td>{{ object.truck_number }}</td>
-                <td>{{ object.model }}</td>
-                <td>{{ object.capacity }}</td>
+                <td>{{ object.name }}</td>
+                <td>{{ object.rank }}</td>
+                <td>{{ object.experience_level }}</td>
                 <td>{{ object.station }}</td>
                 <td>
-                    <a href="{% url 'firetruck_update' object.pk %}" class="btn btn-sm btn-primary" style="max-width: 80px;">Edit</a>
-                    <a href="{% url 'firetruck_delete' object.pk %}" class="btn btn-sm btn-danger" style="max-width: 80px;">Delete</a>
+                    <a href="{% url 'firefighter_update' object.pk %}" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="{% url 'firefighter_delete' object.pk %}" class="btn btn-sm btn-danger">Delete</a>
                 </td>
             </tr>
             {% endfor %}

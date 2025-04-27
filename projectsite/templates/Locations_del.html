@@ -11,11 +11,12 @@
                     <div class="card-body">
                         <div class="col-md-6">
                             <form class="" action="" method="post" novalidate>
-                                <p>Are you sure you want to delete "{{ object }}"?</p>
+                                <p>Are you sure you want to delete "{{ object.name }}"?</p>
                                 {% csrf_token %}
                                 <div class="form-group">
                                     <div class="col-md-12 col-sm-3">
-                                        <button type="submit" class="btn btn-primary btn-rounded">Submit</button>
+                                        <button type="submit" class="btn btn-danger">Yes, delete</button>
+                                        <a href="{% url 'location_list' %}" class="btn btn-secondary">Cancel</a>
                                     </div>
                                 </div>
                             </form>

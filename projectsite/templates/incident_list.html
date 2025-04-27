@@ -46,15 +46,15 @@
               </tr>
             </thead>
             <tbody>
-              {% for object in object_list %}
+              {% for incident in incident_list %}
               <tr>
-                <td>{{ object.date_time|date:"F d, Y" }}</td>
-                <td>{{ object.date_time|time:"H:i A" }}</td>
-                <td>{{ object.severity_level }}</td>
-                <td>{{ object.description }}</td>
+                <td>{{ incident.date_time|date:"F d, Y" }}</td>
+                <td>{{ incident.date_time|time:"H:i A" }}</td>
+                <td>{{ incident.severity_level }}</td>
+                <td>{{ incident.description }}</td>
                 <td>
-                  <a href="{% url 'incident_update' object.pk %}" class="btn btn-sm btn-primary" style="max-width: 80px;">Edit</a>
-                    <a href="{% url 'incident_delete' object.pk %}" class="btn btn-sm btn-danger" style="max-width: 80px;">Delete</a>
+                  <a href="{% url 'incident_update' incident.pk %}" class="btn btn-sm btn-primary" style="max-width: 80px;">Edit</a>
+                    <a href="{% url 'incident_delete' incident.pk %}" class="btn btn-sm btn-danger" style="max-width: 80px;">Delete</a>
                 </td>
               </tr>
               {% empty %}

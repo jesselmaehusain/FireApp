@@ -7,6 +7,7 @@ from fire.views import (
     IncidentListView, IncidentCreateView, IncidentUpdateView, IncidentDeleteView,
     LocationsListView, LocationCreateView, LocationUpdateView, LocationDeleteView,
     FireTruckListView, FireTruckCreateView, FireTruckUpdateView, FireTruckDeleteView,
+    FirefightersListView, FirefightersCreateView, FirefightersUpdateView, FirefightersDeleteView,
 )
 #from fire.views import PieCountBySeverity
 from fire import views
@@ -45,4 +46,10 @@ urlpatterns = [
     path('fire-trucks/new/', views.FireTruckCreateView.as_view(), name='firetruck_add'),
     path('firetruck/<int:pk>/update/', views.FireTruckUpdateView.as_view(), name='firetruck_update'),
     path('firetruck/<int:pk>/delete/', views.FireTruckDeleteView.as_view(), name='firetruck_delete'),
+
+    #Fire Fighters
+    path('firefighters/', views.FirefightersListView.as_view(), name='firefighter_list'),
+    path('firefighters/new/', views.FirefightersCreateView.as_view(), name='firefighter_add'),
+    path('firefighter/<int:pk>/update/', views.FirefightersUpdateView.as_view(), name='firefighter_update'),
+    path('firefighter/<int:pk>/delete/', views.FirefightersDeleteView.as_view(), name='firefighter_delete'),
 ]
