@@ -7,12 +7,12 @@
       <div class="col-md-12">
         <div class="card">
          <div class="card-header">
-           <div class="card-title">List of Fire Fighters</div>
+           <div class="card-title">List of Weather Conditions</div>
         </div>
         </br>
         <div class="col-md-12 row">
           <div class="col-md-4">
-            <form class="navbar-left navbar-form nav-search mr-md-3" action="{% url 'firefighter_list' %}">
+            <form class="navbar-left navbar-form nav-search mr-md-3" action="{% url 'weatherconditions_list' %}">
               <div class="form-group">
                 <div class="input-group">
                   <input type="text" id="search" placeholder="Search ..." class="form-control form-control-sm" name="q" />
@@ -27,7 +27,7 @@
          </div>
             <div class="col-md-6">
               <div class="pull-right">
-                <a href="{% url 'firefighter_add' %}" class="btn btn-rounded custom-add-btn" 
+                <a href="{% url 'stations_add' %}" class="btn btn-rounded custom-add-btn" 
                    style="background: linear-gradient(90deg, #ADD8E6, #87CEEB);">
                    Add new Firestations
                 </a>
@@ -35,28 +35,29 @@
         </div>
         <div class="card-body">
         <table class="table table-striped mt-3">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Rank</th>
-              <th>Experience Level</th>
-              <th>Station</th>
-              <th>Actions</th>
-          </tr>
-      </thead>
-      <tbody>
-          {% for object in object_list %}
+        <thead>
           <tr>
-              <td>{{ object.name }}</td>
-              <td>{{ object.rank }}</td>
-              <td>{{ object.experience_level }}</td>
-              <td>{{ object.station }}</td>
-              <td>
-                  <a href="{% url 'firefighter_update' object.pk %}" class="btn btn-sm btn-primary">Edit</a>
-                  <a href="{% url 'firefighter_delete' object.pk %}" class="btn btn-sm btn-danger">Delete</a>
-              </td>
-          </tr>
-
+            <th>Incident</th>
+            <th>Temperature</th>
+            <th>Humidity</th>
+            <th>Wind Speed</th>
+            <th>Weather Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for object in object_list %}
+        <tr>
+            <td>{{ object.incident }}</td>
+            <td>{{ object.temperature }}</td>
+            <td>{{ object.humidity }}</td>
+            <td>{{ object.wind_speed }}</td>
+            <td>{{ object.weather_description }}</td>
+            <td>
+                <a href="{% url 'weatherconditions_update' object.pk %}" class="btn btn-sm btn-primary">Edit</a>
+                <a href="{% url 'weatherconditions_delete' object.pk %}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
 
               {% empty %}
               <tr>
