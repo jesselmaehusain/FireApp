@@ -10,19 +10,29 @@ from fire.views import (
     FirefightersListView, FirefightersCreateView, FirefightersUpdateView, FirefightersDeleteView,
     WeatherConditionsListView, WeatherConditionsCreateView, WeatherConditionsUpdateView, WeatherConditionsDeleteView,
 )
-#from fire.views import PieCountBySeverity
+from fire.views import PieCountBySeverity, LineCountbyMonth, MultilineIncidentTop3Country,multipleBarbySeverity
 from fire import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('', HomePageView.as_view(), name='home'),
     path('dashboard_chart', ChartView.as_view(), name='dashboard_chart'),
-    #path('chart/', PieCountbySeverity, name='chart'),
+    path('chart/', PieCountBySeverity, name='chart'),
+    path('lineChart/', LineCountbyMonth, name='chart'),
+    path('multilineChart/', MultilineIncidentTop3Country, name='chart'),
+    path('multipleBarChart/', multipleBarbySeverity, name='chart'),
+
+    path('chart/pie/severity/', PieCountBySeverity, name='chart_pie_severity'),
+    path('chart/line/month/', LineCountbyMonth, name='chart-line-month'),
+    path('chart/multiline/top3/', MultilineIncidentTop3Country, name='chart_multiline_top3'),
+    path('chart/bar/severity/', multipleBarbySeverity, name='chart_bar_severity'),
+
 
    # Fire Station
     path('stations', views.map_station, name='map_station'),
     path('maps/jqvmap.html', views.map_station, name='jqvmap'),
     path('incidents/map/', views.map_incidents, name='map_incidents'),
+    path('city_data/', views.city_data, name='city_data'),
 
     # Fire Station CRUD
     path('fire-stations/', FireStationListView.as_view(), name='stations_list'),

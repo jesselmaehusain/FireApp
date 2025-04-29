@@ -11,7 +11,7 @@
                     <div class="card-body">
                         <div class="col-md-6">
                             <form class="" action="" method="post" novalidate>
-                                <p>Are you sure you want to delete "{{ object.station }}"?</p>
+                                <p>Are you sure you want to delete {{ object.rank }} {{ object.name }}?</p>
                                 {% csrf_token %}
                                 <div class="form-group">
                                     <div class="col-md-12 col-sm-3">

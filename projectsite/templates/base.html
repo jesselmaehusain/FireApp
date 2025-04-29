@@ -112,8 +112,8 @@
                 </a>
                 <div class="collapse" id="dashboard">
                   <ul class="nav nav-collapse">
-                    <li><a href="#"><span class="sub-item">Dashboard 1</span></a></li>
-                    <li><a href="#"><span class="sub-item">Dashboard 2</span></a></li>
+                    <li><a href="{% url 'dashboard_chart' %}"><span class="sub-item">Fire App Dashboard</span></a></li>
+                    </a>
                   </ul>
                 </div>
               </li>
@@ -195,8 +195,9 @@
                 </a>
                 <div class="collapse" id="charts">
                   <ul class="nav nav-collapse">
-                    <li><a href="#"><span class="sub-item">Chart Js</span></a></li>
-                    <li><a href="charts/sparkline.html"><span class="sub-item">Sparkline</span></a></li>
+                    <li>
+                      <a href="{% url 'dashboard_chart' %}">
+                        <span class="sub-item">Chart js</span>
                   </ul>
                 </div>
               </li>

@@ -34,7 +34,7 @@ class ChartView(ListView):
     def get_queryset(self, *args, **kwargs):
         pass
 
-    def PieCountBySeverity(request):
+def PieCountBySeverity(request):
         query = """
         SELECT severity_level, COUNT(*) as count
         FROM fire_incident
@@ -77,6 +77,98 @@ def LineCountbyMonth(request):
 
     return JsonResponse(result_with_month_names)
 
+def MultilineIncidentTop3Country(request):
+
+    query = '''
+        SELECT 
+        fl.country,
+        strftime('%m', fi.date_time) AS month,
+        COUNT(fi.id) AS incident_count
+    FROM 
+        fire_incident fi
+    JOIN 
+        fire_locations fl ON fi.location_id = fl.id
+    WHERE 
+        fl.country IN (
+            SELECT 
+                fl_top.country
+            FROM 
+                fire_incident fi_top
+            JOIN 
+                fire_locations fl_top ON fi_top.location_id = fl_top.id
+            WHERE 
+                strftime('%Y', fi_top.date_time) = strftime('%Y', 'now')
+            GROUP BY 
+                fl_top.country
+            ORDER BY 
+                COUNT(fi_top.id) DESC
+            LIMIT 3
+        )
+        AND strftime('%Y', fi.date_time) = strftime('%Y', 'now')
+    GROUP BY 
+        fl.country, month
+    ORDER BY 
+        fl.country, month;
+    '''
+
+    with connection.cursor() as cursor:
+        cursor.execute(query)
+        rows = cursor.fetchall()
+
+    # Initialize a dictionary to store the result
+    result = {}
+
+    # Initialize a set of months from January to December
+    months = set(str(i).zfill(2) for i in range(1, 13))
+
+    # Loop through the query results
+    for row in rows:
+        country = row[0]
+        month = row[1]
+        total_incidents = row[2]
+
+        # If the country is not in the result dictionary, initialize it with all months set to zero
+        if country not in result:
+            result[country] = {month: 0 for month in months}
+
+        # Update the incident count for the corresponding month
+        result[country][month] = total_incidents
+
+    # Ensure there are always 3 countries in the result
+    while len(result) < 3:
+        # Placeholder name for missing countries
+        missing_country = f"Country {len(result) + 1}"
+        result[missing_country] = {month: 0 for month in months}
+
+    for country in result:
+        result[country] = dict(sorted(result[country].items()))
+
+    return JsonResponse(result)
+
+def multipleBarbySeverity(request):
+    incidents = Incident.objects.all()
+    result = defaultdict(lambda: defaultdict(int))
+
+    for incident in incidents:
+        month = incident.date_time.month if incident.date_time else None
+        severity = incident.severity_level
+        
+        if month is not None:
+            result[severity][month] += 1
+
+    # Convert defaultdict to regular dict for JSON serialization
+    result = {k: dict(v) for k, v in result.items()}
+
+    # Filter out None values and sort the results
+    for level in result:
+        result[level] = {k: v for k, v in result[level].items() if k is not None}
+        result[level] = dict(sorted(result[level].items()))
+    
+    # Convert month numbers to month names
+    result_with_month_names = {severity: {calendar.month_abbr[month]: count for month, count in months.items()} for severity, months in result.items()}
+
+    return JsonResponse(result_with_month_names)
+
 
 def map_station(request):
     
@@ -102,7 +194,6 @@ def map_station(request):
 
 
 def map_incidents(request):
-    
     fire_incidents_qs = Incident.objects.select_related('location')
 
     fireIncidents = []
@@ -114,18 +205,56 @@ def map_incidents(request):
                 'date_time': incident.date_time.strftime('%Y-%m-%d %H:%M') if incident.date_time else 'N/A',
                 'latitude': float(incident.location.latitude),
                 'longitude': float(incident.location.longitude),
-                'city': incident.location.city
+                'city': incident.location.city,
+                'address': incident.location.address
             })
 
+    cities = sorted(set([incident['address'] for incident in fireIncidents if incident['address']]))
+
+    selected_city = request.GET.get('city', None)
     
-    cities = sorted(set([incident['city'] for incident in fireIncidents if incident['city']]))
+    filtered_incidents = fireIncidents
+    city_lat, city_lon = None, None
+    if selected_city:
+        filtered_incidents = [incident for incident in fireIncidents if incident['address'] == selected_city]
+        if filtered_incidents:
+            city_lat = filtered_incidents[0]['latitude']
+            city_lon = filtered_incidents[0]['longitude']
 
     context = {
-        'fireIncidents': fireIncidents,
-        'cities': cities
+        'fireIncidents': filtered_incidents,
+        'cities': cities,
+        'selected_city': selected_city,
+        'city_lat': city_lat,
+        'city_lon': city_lon
     }
 
     return render(request, 'map_incidents.html', context)
+
+def city_data(request):
+    selected_city = request.GET.get('city', None)
+    
+    if selected_city:
+        incidents = Incident.objects.filter(location__address=selected_city)
+        
+        incident_data = []
+        for incident in incidents:
+            if incident.location.latitude and incident.location.longitude:
+                incident_data.append({
+                    'latitude': float(incident.location.latitude),
+                    'longitude': float(incident.location.longitude),
+                    'address': incident.location.address,
+                    'description': incident.description,
+                    'severity': incident.severity_level,
+                    'date_time': incident.date_time.strftime('%Y-%m-%d %H:%M') if incident.date_time else 'N/A'
+                })
+        
+        return JsonResponse({'latitude': incidents[0].location.latitude if incidents else None, 
+                             'longitude': incidents[0].location.longitude if incidents else None,
+                             'incidents': incident_data})
+    else:
+        return JsonResponse({'latitude': None, 'longitude': None, 'incidents': []})
+
 
 
 
@@ -331,6 +460,17 @@ class FirefightersCreateView(CreateView):
     form_class = FirefightersForm
     template_name = 'FireFighters_add.html'
     success_url = reverse_lazy('firefighter_list')
+
+    def form_valid(self, form):
+        # Log form data to see what was submitted
+        print(f"Form is valid. Saving: {form.cleaned_data}")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        # Log form errors if there are any
+        print(f"Form errors: {form.errors}")
+        return super().form_invalid(form)
+
 
 class FirefightersUpdateView(UpdateView):
     model = Firefighters

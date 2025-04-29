@@ -29,7 +29,7 @@
               <div class="pull-right">
                 <a href="{% url 'firefighter_add' %}" class="btn btn-rounded custom-add-btn" 
                    style="background: linear-gradient(90deg, #ADD8E6, #87CEEB);">
-                   Add new Firestations
+                   Add new Fire Fighters
                 </a>
             </div>  
         </div>
@@ -45,18 +45,17 @@
           </tr>
       </thead>
       <tbody>
-          {% for object in object_list %}
+          {% for object in firefighter_list %}
           <tr>
               <td>{{ object.name }}</td>
               <td>{{ object.rank }}</td>
               <td>{{ object.experience_level }}</td>
-              <td>{{ object.station }}</td>
+              <td>{{ object.station.name }}</td>
               <td>
                   <a href="{% url 'firefighter_update' object.pk %}" class="btn btn-sm btn-primary">Edit</a>
                   <a href="{% url 'firefighter_delete' object.pk %}" class="btn btn-sm btn-danger">Delete</a>
               </td>
           </tr>
-
 
               {% empty %}
               <tr>
