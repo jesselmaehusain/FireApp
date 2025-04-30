@@ -22,7 +22,10 @@ from datetime import datetime
 class HomePageView(ListView):
     model = Locations
     context_object_name = 'home'
-    template_name = "home.html"
+    template_name = "chart.html"
+
+def landing_page(request):
+    return redirect('dashboard_chart')
 
 class ChartView(ListView):
     template_name = 'chart.html'
