@@ -287,8 +287,9 @@ class FireStationCreateView(CreateView):
 
     def form_valid(self, form):
         station_name = form.instance.name
-        messages.success(self.request, f'Fire Station "{station_name}" created successfully!')
+        messages.success(self.request, f'Fire Station "{station_name}" has been successfully Created!')
         return super().form_valid(form)
+    
     
 class FireStationUpdateView(UpdateView):
     form_class = FireStationForm
@@ -296,25 +297,28 @@ class FireStationUpdateView(UpdateView):
     success_url = reverse_lazy('stations_list')
 
     def get_queryset(self):
-        # Custom queryset to fetch the specific FireStation instance
         return FireStation.objects.filter(id=self.kwargs['pk'])
 
     def form_valid(self, form):
-        # Perform default behavior for valid form submission
+        station_name = form.instance.name
+        messages.success(self.request, f'Fire Station "{station_name}" has been successfully updated!')
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        # Custom behavior for invalid form submission (optional)
         return super().form_invalid(form)
 
     def get_success_url(self):
-        # Optionally, you can add dynamic success URL logic here
         return super().get_success_url()
-    
+
 class FireStationDeleteView(DeleteView):
-    model = FireStationForm
+    model = FireStation
     template_name= 'stations_del.html'
     success_url = reverse_lazy('stations_list')
+
+    def form_valid(self, form):
+        station_name = self.object.name
+        messages.success(self.request, f'Fire Station "{station_name}" has been successfully Deleted!')
+        return super().form_valid(form)
 
     
     def get_queryset(self):
@@ -322,7 +326,7 @@ class FireStationDeleteView(DeleteView):
     
 #Incident classView
 class IncidentListView(ListView):
-    orm_class = Incident_Form
+    form_class = Incident_Form
     model = Incident
     template_name = 'incident_list.html'
     context_object_name = 'incident_list'
@@ -347,32 +351,46 @@ class IncidentCreateView(CreateView):
     success_url = reverse_lazy('incident_list')
 
     def form_valid(self, form):
+        description = form.instance.description
+        short_description = description[:50] + "..." if len(description) > 50 else description
+        messages.success(self.request, f'Incident "{short_description}" has been successfully created!')
         return super().form_valid(form)
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['incident_list'] = self.success_url
-        return context
 
-    
+
 class IncidentUpdateView(UpdateView):
     model = Incident
+    form_class = Incident_Form
     template_name = 'incident_edit.html'
-    fields = ['description', 'severity_level', 'location', 'date_time']
     success_url = reverse_lazy('incident_list')
 
     def form_valid(self, form):
+        description = form.instance.description
+        short_description = description[:50] + "..." if len(description) > 50 else description
+        messages.success(self.request, f'Incident "{short_description}" has been successfully updated!')
         return super().form_valid(form)
+
 
     
 class IncidentDeleteView(DeleteView):
     model = Incident
     template_name = 'incident_del.html'
     success_url = reverse_lazy('incident_list')
+    context_object_name = 'incident'
 
-    def get_queryset(self):
-        return Incident.objects.filter(id=self.kwargs['pk'])
-    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        description = self.object.description[:50] + "..." if len(self.object.description) > 50 else self.object.description
+        messages.success(self.request, f'"{description}" has been successfully deleted')
+        return response
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = f"Delete Incident #{self.object.id}"
+        context['incident_list'] = self.success_url
+        return context
+
+
 
 class LocationsListView(ListView):
     model = Locations

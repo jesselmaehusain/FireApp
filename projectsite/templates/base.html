@@ -253,5 +253,101 @@
     <script src="{% static 'js/atlantis.min.js' %}"></script>
 
     {% block chart %}{% endblock %}
+
+    <!--Toast Notifactions-->
+ <div id="toast-container" aria-live="polite" aria-atomic="true" style="position: fixed; bottom: 20px; right: 20px; z-index: 1050">
+    <!-- Toasts will be dynamically inserted here -->
+</div>
+
+{% if messages %}
+<!-- Toast container -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    {% for message in messages %}
+    const toastType = '{{ message.tags }}' || 'info';
+
+    const iconColors = {
+        'info': 'filter: invert(55%) sepia(98%) saturate(748%) hue-rotate(183deg) brightness(99%) contrast(94%)',
+        'success': 'filter: invert(67%) sepia(31%) saturate(925%) hue-rotate(81deg) brightness(91%) contrast(90%)',
+        'warning': 'filter: invert(80%) sepia(85%) saturate(459%) hue-rotate(349deg) brightness(102%) contrast(104%)',
+        'error': 'filter: invert(44%) sepia(45%) saturate(1352%) hue-rotate(318deg) brightness(91%) contrast(96%)'
+    };
+
+    const gradients = {
+        'info': 'linear-gradient(135deg, #007BFF 0%, #0056b3 100%)',
+        'success': 'linear-gradient(135deg, #28a745 0%, rgb(229, 240, 239) 100%)',
+        'warning': 'linear-gradient(135deg, #ffc107 0%, #fd7e14 100%)',
+        'error': 'linear-gradient(135deg, #dc3545 0%, #a71d2a 100%)'
+    };
+
+    const borderColor = {
+        'info': '#007BFF',
+        'success': '#000000',
+        'warning': '#ffc107',
+        'error': '#dc3545'
+    };
+
+    const toastHTML = `
+    <div class="toast fade show ${toastType}" role="alert" aria-live="assertive" aria-atomic="true"
+         style="margin-bottom: 15px; opacity: 0; transform: translateY(20px); transition: all 0.3s ease;">
+        
+        <div class="toast-header d-flex justify-content-between align-items-center"
+             style="background: ${gradients[toastType]};
+                    color: white;
+                    border-radius: 8px 8px 0 0;
+                    padding: 10px 15px;">
+
+            <div class="d-flex align-items-center gap-2">
+                <img src="{% static 'img/icon.png' %}" class="rounded"
+                     style="width: 25px; height: 25px; ${iconColors[toastType] || ''}" alt="Icon">
+                <strong>${toastType.charAt(0).toUpperCase() + toastType.slice(1)}</strong>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <small style="color: black;">Just now</small>
+                <button type="button" class="close-btn"
+                        aria-label="Close"
+                        style="color: white; background: none; border: none;
+                               font-size: 1.25rem; padding: 0; line-height: 1;
+                               cursor: pointer;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="toast-body"
+             style="background-color: white; color: #212529; border-radius: 0 0 8px 8px;
+                    padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    border-left: 4px solid ${borderColor[toastType]};">
+            {{ message|escapejs }}
+        </div>
+    </div>`;
+
+    const container = document.getElementById('toast-container');
+    container.insertAdjacentHTML('beforeend', toastHTML);
+
+    setTimeout(() => {
+        const toastElement = container.lastElementChild;
+        toastElement.style.opacity = '1';
+        toastElement.style.transform = 'translateY(0)';
+
+        // Auto hide after 5 seconds
+        setTimeout(() => {
+            toastElement.style.opacity = '0';
+            toastElement.style.transform = 'translateY(20px)';
+            setTimeout(() => toastElement.remove(), 300);
+        }, 5000);
+
+        // Manual close
+        toastElement.querySelector('.close-btn').addEventListener('click', () => {
+            toastElement.style.opacity = '0';
+            toastElement.style.transform = 'translateY(20px)';
+            setTimeout(() => toastElement.remove(), 300);
+        });
+    }, 50);
+    {% endfor %}
+});
+</script>
+{% endif %}
   </body>
 </html>
