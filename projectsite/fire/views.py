@@ -264,7 +264,7 @@ class FireStationListView(ListView):
     model = FireStation
     context_object_name = 'stations'
     template_name = 'stations_list.html'
-    paginate_by = 5
+    paginate_by = 10
 
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
@@ -328,7 +328,7 @@ class IncidentListView(ListView):
     model = Incident
     template_name = 'incident_list.html'
     context_object_name = 'incident_list'
-    paginate_by = 5
+    paginate_by = 10
 
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
@@ -393,7 +393,7 @@ class LocationsListView(ListView):
     form_class = LocationForm
     template_name = 'Locations_list.html'
     context_object_name = 'location_list'
-    paginate_by = 5
+    paginate_by = 10
 
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
@@ -458,7 +458,7 @@ class FireTruckListView(ListView):
     model = FireTruck
     template_name = 'FireTrucks_list.html'
     context_object_name = 'firetruck'
-    paginate_by = 5
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -505,7 +505,7 @@ class FirefightersListView(ListView):
     form_class = FirefightersForm
     template_name = 'FireFighters_list.html'
     context_object_name = 'firefighter_list'
-    paginate_by = 5
+    paginate_by = 10
 
     def get_queryset(self):
         query = self.request.GET.get('q')  
@@ -567,7 +567,7 @@ class WeatherConditionsListView(ListView):
     model = WeatherConditions
     template_name = 'WeatherCon_list.html'
     context_object_name = 'weatherconditions_list'
-    paginate_by = 5
+    paginate_by = 10
 
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
